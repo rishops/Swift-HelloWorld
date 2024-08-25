@@ -1,0 +1,49 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    environment:
+      xcode: latest
+      cocoapods: default
+      vars:
+        PROJECT_NAME: "HelloWorldApp"
+        SCHEME: "HelloWorldApp"
+        EXPORT_METHOD: "development"  # Change this to match your distribution method (e.g., app-store, development, enterprise)
+        IPHONEOS_DEPLOYMENT_TARGET: "12.0"
+    triggering:
+      events:
+        - push
+        - pull_request
+    scripts:
+      - name: Install Dependencies
+        script: |
+          gem install xcodegen
+          xcodegen generate
+
+      - name: Set up keychain and provisioning profiles
+        script: |
+          # Set up your signing identities and provisioning profiles if needed
+          # You might need to add environment variables for provisioning profile and certificate
+
+      - name: Build IPA
+        script: |
+          xcodebuild -project $PROJECT_NAME.xcodeproj \
+            -scheme $SCHEME \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $PWD/build/$PROJECT_NAME.xcarchive \
+            archive \
+            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
+            CODE_SIGN_IDENTITY="iPhone Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
+            IPHONEOS_DEPLOYMENT_TARGET=$IPHONEOS_DEPLOYMENT_TARGET
+
+      - name: Export IPA
+        script: |
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/$PROJECT_NAME.xcarchive \
+            -exportPath $PWD/build/$PROJECT_NAME \
+            -exportOptionsPlist ExportOptions.plist
+          
+    artifacts:
+      - build/**/*.ipa
+      - build/**/*.xcarchive
