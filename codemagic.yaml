@@ -5,8 +5,8 @@ workflows:
       xcode: latest
       cocoapods: default
       vars:
-        PROJECT_NAME: "HelloWorldApp"
-        SCHEME: "HelloWorldApp"
+        PROJECT_NAME: "HelloWorld"
+        SCHEME: "HelloWorld"
         EXPORT_METHOD: "development"  # Change this to match your distribution method (e.g., app-store, development, enterprise)
         IPHONEOS_DEPLOYMENT_TARGET: "12.0"
     triggering:
